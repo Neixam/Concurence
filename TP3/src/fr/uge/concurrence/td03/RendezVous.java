@@ -10,16 +10,18 @@ public class RendezVous<V> {
     synchronized (lock) {
       Objects.requireNonNull(value);
       this.value = value;
-      lock.notify();
     }
   }
 
   public V get() throws InterruptedException {
-    synchronized (lock) {
-      while (value == null) {
-        lock.wait();
+    for (;;) {
+      Thread.sleep(1);
+      synchronized (lock) {
+        if (value == null) {
+          continue;
+        }
+        return value;
       }
-      return value;
     }
   }
 }
