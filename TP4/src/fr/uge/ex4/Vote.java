@@ -43,7 +43,7 @@ public class Vote {
         Thread.sleep(2_000);
         System.out.println("The winner is " + vote.vote("un"));
       } catch (InterruptedException e) {
-        throw new AssertionError(e);
+        Thread.currentThread().interrupt();
       }
     });
     Thread.ofPlatform().start(() -> {
@@ -51,7 +51,7 @@ public class Vote {
         Thread.sleep(1_500);
         System.out.println("The winner is " + vote.vote("zero"));
       } catch (InterruptedException e) {
-        throw new AssertionError(e);
+        Thread.currentThread().interrupt();
       }
     });
     Thread.ofPlatform().start(() -> {
@@ -59,7 +59,7 @@ public class Vote {
         Thread.sleep(1_000);
         System.out.println("The winner is " + vote.vote("un"));
       } catch (InterruptedException e) {
-        throw new AssertionError(e);
+        Thread.currentThread().interrupt();
       }
     });
     System.out.println("The winner is " + vote.vote("zero"));
