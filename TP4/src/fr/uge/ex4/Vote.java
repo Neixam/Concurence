@@ -5,33 +5,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Vote {
-  private final HashMap<String, Integer> map;
+  private final HashMap<String, Integer> map = new HashMap<>();
   private final int totalVote;
   private int count;
   public Vote(int totalVote) {
-    if (totalVote <= 0) {
-      throw new IllegalArgumentException("0 >= value forbidden");
+    synchronized (map) {
+      if (totalVote <= 0) {
+        throw new IllegalArgumentException("0 >= value forbidden");
+      }
+      this.totalVote = totalVote;
     }
-    this.totalVote = totalVote;
-    map = new HashMap<>();
   }
 
   private String computeWinner() {
     synchronized (map) {
       return map.entrySet().stream()
               .sorted(Comparator.comparingInt(Map.Entry::getValue))
+              .sorted(Map.Entry.comparingByKey())
               .map(Map.Entry::getKey)
               .findFirst()
               .orElseThrow();
     }
   }
-  public String vote(String titu) {
+  public String vote(String titu) throws InterruptedException {
     synchronized (map) {
       if (count == totalVote) {
         return computeWinner();
       }
       count++;
       map.compute(titu,  (k, v) -> v == null ? 1 : v + 1);
+      while (count != totalVote) {
+        map.wait();
+      }
+      map.notifyAll();
       return computeWinner();
     }
   }
