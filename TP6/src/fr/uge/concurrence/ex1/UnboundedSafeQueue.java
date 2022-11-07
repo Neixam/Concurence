@@ -38,7 +38,7 @@ public class UnboundedSafeQueue<T> {
     var safeQueue = new UnboundedSafeQueue<String>();
     IntStream.range(0, 3).forEach(i ->
             Thread.ofPlatform().name("Thread " + i).start(() -> {
-              for (; ; ) {
+              for (;;) {
                 safeQueue.add(Thread.currentThread().getName());
                 try {
                   Thread.sleep(2000);

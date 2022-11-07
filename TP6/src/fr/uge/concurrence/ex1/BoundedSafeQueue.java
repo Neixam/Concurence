@@ -57,7 +57,7 @@ public class BoundedSafeQueue<V> {
     var safeQueue = new BoundedSafeQueue<String>(5);
     IntStream.range(0, 12).forEach(i ->
             Thread.ofPlatform().name("Thread " + i).start(() -> {
-              for (; ; ) {
+              for (;;) {
                 try {
                   safeQueue.put(Thread.currentThread().getName());
                   Thread.sleep(2000);
