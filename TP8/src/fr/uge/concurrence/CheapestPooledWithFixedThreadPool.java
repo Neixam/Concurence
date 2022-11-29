@@ -1,7 +1,6 @@
 package fr.uge.concurrence;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.stream.IntStream;
@@ -10,7 +9,6 @@ public class CheapestPooledWithFixedThreadPool {
   private final String item;
   private final int timeoutMilliPerRequest;
   private final FixedThreadPool fixedThreadPool;
-  private final int poolSize;
 
   private final static int NB_SITES = Request.ALL_SITES.size();
 
@@ -21,14 +19,19 @@ public class CheapestPooledWithFixedThreadPool {
     this.item = item;
     this.timeoutMilliPerRequest = timeoutMilliPerRequest;
     fixedThreadPool = new FixedThreadPool(poolSize);
-    this.poolSize = poolSize;
   }
 
   public Optional<Answer> retrieve() throws InterruptedException {
-    IntStream.range(0, Request.ALL_SITES.size()).forEach(j -> fixedThreadPool.submit(() -> {
-      var request = sitesQueue.take();
-      answersQueue.put(request.request(timeoutMilliPerRequest));
-    }));
+    IntStream.range(0, Request.ALL_SITES.size()).forEach(j -> {
+      try {
+        fixedThreadPool.submit(() -> {
+          var request = sitesQueue.take();
+          answersQueue.put(request.request(timeoutMilliPerRequest));
+        });
+      } catch (InterruptedException e) {
+        System.exit(0);
+      }
+    });
     fixedThreadPool.start();
     for (var s : Request.ALL_SITES) {
       sitesQueue.put(new Request(s, item));

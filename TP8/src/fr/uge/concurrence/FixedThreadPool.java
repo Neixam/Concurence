@@ -31,12 +31,8 @@ public class FixedThreadPool {
         }));
     }
 
-    public void submit(Task r) {
-        try {
-            tasksQueue.put(r);
-        } catch (InterruptedException e) {
-            return;
-        }
+    public void submit(Task r) throws InterruptedException {
+        tasksQueue.put(r);
     }
 
     public void stop() {
